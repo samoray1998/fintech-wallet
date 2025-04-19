@@ -8,7 +8,7 @@ import (
 
 type User struct {
 	ID        primitive.ObjectID `bson:"_id`
-	Name      string             `bson:"name`
+	FullName  string             `bson:"full_name`
 	Password  string             `bson:"password_hash`
 	Email     string             `bson:"email`
 	KYCStatus string             `bson:"kyc_status"` // "unverified", "pending", "verified"

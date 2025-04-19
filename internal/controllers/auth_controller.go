@@ -21,10 +21,19 @@ func NewAuthController(authService *services.AuthService, userService *services.
 }
 
 func (c *AuthController) Register(ctx *gin.Context) {
-	var user models.User
-	if err := ctx.ShouldBindJSON(&user); err != nil {
+	var newUser struct {
+		FullName string `json:"full_name" binding:"required"`
+		Email    string `json:"email" binding:"required,email"`
+		Password string `json:"password" binding:"required,min=8"`
+	}
+	if err := ctx.ShouldBindJSON(&newUser); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+	user := models.User{
+		FullName: newUser.FullName,
+		Email:    newUser.Email,
+		Password: newUser.Password,
 	}
 
 	createdUser, err := c.userService.Register(&user)
@@ -49,7 +58,7 @@ func (c *AuthController) Login(ctx *gin.Context) {
 
 	user, err := c.userService.VerifyCredentials(creds.Email, creds.Password)
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials "})
 		return
 	}
 

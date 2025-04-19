@@ -25,20 +25,12 @@ func NewUserRepo(db *mongo.Database, collectionName string) *UserRepository {
 
 // / CreateUser with new hash password
 func (r *UserRepository) CreateUser(user *models.User) (*models.User, error) {
-	/// Hash password before storing
-
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, err
-	}
 	user.ID = primitive.NewObjectID()
-	user.Password = string(hashedPassword)
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
 	user.KYCStatus = "unverified"
 
-	_, err = r.collection.InsertOne(context.Background(), user)
-
+	_, err := r.collection.InsertOne(context.Background(), user)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +46,7 @@ func (r *UserRepository) FindByID(id string) (*models.User, error) {
 		return nil, err
 	}
 	var user models.User
-	err = r.collection.FindOne(context.Background(), bson.M{"_id": objectID}).Decode(&user)
+	err = r.collection.FindOne(context.Background(), bson.M{"id": objectID}).Decode(&user)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, errors.New("user not found")
